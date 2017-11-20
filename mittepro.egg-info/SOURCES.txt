@@ -1,0 +1,15 @@
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+mittepro/__init__.py
+mittepro/client.py
+mittepro/exceptions.py
+mittepro/models.py
+mittepro/test_variables.py
+mittepro/tests.py
+mittepro.egg-info/PKG-INFO
+mittepro.egg-info/SOURCES.txt
+mittepro.egg-info/dependency_links.txt
+mittepro.egg-info/requires.txt
+mittepro.egg-info/top_level.txt
