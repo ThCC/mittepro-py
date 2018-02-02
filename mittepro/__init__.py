@@ -54,8 +54,9 @@ class Api(object):
     _api_key = ''
     _api_secret = ''
 
-    def __init__(self, fail_silently=False):
+    def __init__(self, fail_silently=False, timeout_read=15):
         self._session = Session()
+        self.timeout_read = timeout_read if timeout_read > 1 else 1
         self.fail_silently = fail_silently
 
     def set_header(self, header):
@@ -85,14 +86,14 @@ class Api(object):
         auth = request.sign(token)
         return auth
 
-    def request(self, method=None, url=None, headers=None, payload=None, timeout_connect=10, timeout_read=15):
+    def request(self, method=None, url=None, headers=None, payload=None, timeout_connect=10):
         if not url:
             url = self.endpoint
         if not method:
             method = self.http_method
         if not headers:
             headers = self.headers
-        timeout = (timeout_connect, timeout_read)
+        timeout = (timeout_connect, self.timeout_read)
 
         url = self.server_uri + url
 
