@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='1.2.0',
+    version='1.2.1',
     install_requires=[
         'requests==2.18.4',
         'simplejson==3.6.4',
@@ -16,7 +16,7 @@ setup(
     long_description=open("README.rst").read(),
     packages=find_packages(),
     include_package_data=True,
-    python_requires='==2.7',
+    python_requires='>=2.7',
     license='Apache-2.0',
     classifiers=[
         'Environment :: Web Environment',

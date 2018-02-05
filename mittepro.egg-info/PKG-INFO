@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: mittepro
-Version: 1.2.0
+Version: 1.2.1
 Summary: MittePro is a powerful marketing tool with features to help companies with their marketing goals and deliver emails from their websites and apps.
 Home-page: https://github.com/ThCC/mittepro-py
 Author: Thiago Cardoso de Castro
@@ -122,4 +122,4 @@ Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 2
 Classifier: Programming Language :: Python :: 2.7
 Classifier: Topic :: Software Development :: Libraries
-Requires-Python: ==2.7
+Requires-Python: >=2.7
