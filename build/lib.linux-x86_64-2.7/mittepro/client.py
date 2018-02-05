@@ -7,8 +7,8 @@ from mittepro.exceptions import ImproperlyConfigured
 
 class MittePro(Api):
 
-    def __init__(self, key=None, secret=None, fail_silently=False, server_uri=None):
-        super(MittePro, self).__init__(fail_silently)
+    def __init__(self, key=None, secret=None, fail_silently=False, server_uri=None, timeout_read=15):
+        super(MittePro, self).__init__(fail_silently, timeout_read)
 
         if server_uri:
             self.server_uri = server_uri

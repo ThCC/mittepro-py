@@ -68,7 +68,8 @@ class TestAuthentication(unittest.TestCase):
             # message_html=self.variables["message_html"],
             from_name=self.variables['from_name'],
             from_email=self.variables['from_email'],
-            subject="Just a test - Sended From Client"
+            subject="Just a test - Sended From Client AT 09",
+            send_at='2018-02-05 09:32:00'
         )
         response = self.mittepro.send(mail)
         if response and 'emails_enviados' in response:

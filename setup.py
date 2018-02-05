@@ -5,11 +5,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='1.1.0',
+    version='1.2.0',
     install_requires=[
-        'requests==2.11.0',
+        'requests==2.18.4',
         'simplejson==3.6.4',
-        'apysignature==0.1.3'
+        'apysignature==0.1.3',
     ],
     url='https://github.com/ThCC/mittepro-py',
     description='MittePro is a powerful marketing tool with features to help companies with their marketing goals and deliver emails from their websites and apps.',

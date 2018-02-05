@@ -1,12 +1,12 @@
 variables = {
     "recipients": [
         "Thiago de Castro <thiago.decastro2@gmail.com>",
-        "Thiago C de Castro <THIAGO.CIRRUS@ALTERDATA.COM.BR>",
-        "<success@simulator.amazonses.com>",
-        "<bounce@simulator.amazonses.com>",
-        "<ooto@simulator.amazonses.com>",
-        "<complaint@simulator.amazonses.com>",
-        "<suppressionlist@simulator.amazonses.com>",
+        # "Thiago C de Castro <THIAGO.CIRRUS@ALTERDATA.COM.BR>",
+        # "<success@simulator.amazonses.com>",
+        # "<bounce@simulator.amazonses.com>",
+        # "<ooto@simulator.amazonses.com>",
+        # "<complaint@simulator.amazonses.com>",
+        # "<suppressionlist@simulator.amazonses.com>",
     ],
     "context_per_recipient": {
         "thiago.decastro2@gmail.com": {"foo": True},
@@ -20,7 +20,7 @@ variables = {
     "key": '1e4be7cdd03545958e34',
     "secret": 'cf8cdba282104ed88f0a'
 }
-server_uri_test = 'http://172.16.72.31:8000'
+server_uri_test = 'http://172.16.72.2:8001'
 search_variables = {
     'app_ids': '1001',
     'start': '2017-02-27',

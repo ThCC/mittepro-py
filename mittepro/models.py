@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+from datetime import datetime
 from mittepro.exceptions import InvalidParam
 from mittepro import item_in_dict, item_not_in_dict, attr_in_instance, attr_not_in_instance
 
@@ -18,6 +19,8 @@ class Mail(object):
 
         # General mail vars
         self.set_attr('tags', kwargs)
+        self.set_attr('send_at', kwargs)
+        self.validate_send_at(kwargs)
         self.set_attr('subject', kwargs)
         self.set_attr('from_name', kwargs)
         self.set_attr('from_email', kwargs)
@@ -37,6 +40,18 @@ class Mail(object):
         self.set_attr('use_tpl_default_email', kwargs)
         self.set_attr('use_tpl_default_subject', kwargs)
         self.set_attr('context_per_recipient', kwargs)
+
+    def validate_send_at(self, kwargs):
+        send_at = kwargs.get('send_at')
+        if not send_at:
+            return True
+        try:
+            datetime.strptime(send_at, '%Y-%m-%d %H:%M:%S')
+            return True
+        except ValueError:
+            raise InvalidParam(
+                message_values=("'send_at'", 'Invalid format, expecting: YYYY-mm-dd HH:MM:SS')
+            )
 
     def set_attr(self, attr, kwargs):
         if attr in kwargs:
