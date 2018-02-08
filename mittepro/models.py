@@ -29,6 +29,9 @@ class Mail(object):
         self.set_attr('recipient_list', kwargs)
         self.check_recipient_list()
         self.set_attr('activate_tracking', kwargs)
+        self.set_attr('track_open', kwargs)
+        self.set_attr('track_html_link', kwargs)
+        self.set_attr('track_text_link', kwargs)
         self.set_attr('get_text_from_html', kwargs)
         # self.set_attr('expose_recipients_list', kwargs)
 

@@ -63,13 +63,17 @@ class TestAuthentication(unittest.TestCase):
     def test_method_post_text(self):
         mail = Mail(
             recipient_list=self.variables['recipients'],
-            message_text=self.variables["message_text"],
+            message_text='Mah oia só https://pypi.org/',
             # remove comment if you gonna tested
             # message_html=self.variables["message_html"],
             from_name=self.variables['from_name'],
             from_email=self.variables['from_email'],
             subject="Just a test - Sended From Client AT 09",
-            send_at='2018-02-05 09:32:00'
+            # send_at='2018-02-05 09:32:00',
+            activate_tracking=False,
+            track_open=True,
+            track_html_link=True,
+            track_text_link=True,
         )
         response = self.mittepro.send(mail)
         if response and 'emails_enviados' in response:
