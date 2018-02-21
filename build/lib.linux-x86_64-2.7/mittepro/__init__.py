@@ -1,7 +1,7 @@
 import json
 import logging
 import requests
-from mittepro.exceptions import APIError
+from mittepro.exceptions import APIError, TimeoutError
 from apysignature.query_encoder import QueryEncoder
 from apysignature.signature import Request as Request_sig, Token
 from requests import Request, Session, ReadTimeout, ConnectTimeout, HTTPError
@@ -56,7 +56,7 @@ class Api(object):
 
     def __init__(self, fail_silently=False, timeout_read=15):
         self._session = Session()
-        self.timeout_read = timeout_read if timeout_read > 1 else 1
+        self.timeout_read = timeout_read
         self.fail_silently = fail_silently
 
     def set_header(self, header):
@@ -103,20 +103,19 @@ class Api(object):
             url = self.query_encode(url, auth)
 
         logging.info('EXTERNAL API: sending request on {0}'.format(url))
-        if payload and method == 'GET':
-            response = requests.get(url, payload)
-        else:
-            request = Request(
-                method, url,
-                json=payload,
-                headers=headers
-            )
-            prepped = request.prepare()
-            response = self._session.send(prepped, timeout=timeout)
-
         try:
-            valid_codes = (200, 201)
+            if payload and method == 'GET':
+                response = requests.get(url, payload)
+            else:
+                request = Request(
+                    method, url,
+                    json=payload,
+                    headers=headers
+                )
+                prepped = request.prepare()
+                response = self._session.send(prepped, timeout=timeout)
 
+            valid_codes = (200, 201)
             if hasattr(response, 'status'):
                 status_code = response.status
             else:
@@ -126,18 +125,25 @@ class Api(object):
                 response = json.loads(response.content)
             elif status_code not in valid_codes:
                 logging.info("EXTERNAL API: request error: {0}".format(response.reason))
+                content = json.loads(response.content)
+                msg = content['error'] if 'error' in content else content['detail']
                 if not self.fail_silently:
-                    content = json.loads(response.content)
-                    msg = content['error'] if 'error' in content else content['detail']
                     raise APIError(message_values=(msg.encode('utf8'),))
-                response = None
+                response = {'error': msg.encode('utf8')}
             return response
-        except (ReadTimeout, ConnectTimeout, HTTPError) as e:
+        except ReadTimeout as e:
+            logging.info("EXTERNAL API: request error: {0}".format(e))
+            if not self.fail_silently:
+                raise TimeoutError(message_values=(str(self.timeout_read),))
+            else:
+                return {'error': "The server did not respond within the time you stipulated. "
+                                 "The time was {0} second(s)".format(str(self.timeout_read))}
+        except (ConnectTimeout, HTTPError) as e:
             logging.info("EXTERNAL API: request error: {0}".format(e))
             if not self.fail_silently:
                 raise e
             else:
-                return None
+                return {'error': "{0}".format(e)}
 
     def sync_request(self, method, url, payload=None, headers=None):
         return self.request(method, url, payload, headers)

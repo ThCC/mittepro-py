@@ -57,8 +57,8 @@ class TestAuthentication(unittest.TestCase):
         if search_variables:
             self.search_variables = search_variables
 
-        self.mittepro = MittePro(key=self.variables['key'], secret=self.variables['secret'],
-                                 server_uri=self.server_uri_test, timeout_read=5)
+        self.mittepro = MittePro(key=self.variables['key'], secret=self.variables['secret'], fail_silently=True,
+                                 server_uri=self.server_uri_test, timeout_read=0.001)
 
     def test_method_post_text(self):
         mail = Mail(
