@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import base64
 from datetime import datetime
 from mittepro.exceptions import InvalidParam
 from mittepro import item_in_dict, item_not_in_dict, attr_in_instance, attr_not_in_instance
@@ -16,6 +17,8 @@ class Mail(object):
             'Impossível enviar um email sem uma lista de destinatários'
         assert 'subject' in kwargs or item_in_dict(kwargs, 'use_tpl_default_subject'), \
             'Impossível enviar um email sem um assunto'
+        self.attach_size_limit_mb = 10
+        self.attach_size_limit_b = self.attach_size_limit_mb * 1024 * 1024
 
         # General mail vars
         self.set_attr('tags', kwargs)
@@ -33,6 +36,8 @@ class Mail(object):
         self.set_attr('track_html_link', kwargs)
         self.set_attr('track_text_link', kwargs)
         self.set_attr('get_text_from_html', kwargs)
+        self.set_attr('attachments', kwargs)
+        self.check_attachments()
         # self.set_attr('expose_recipients_list', kwargs)
 
         # Template mail vars
@@ -52,9 +57,7 @@ class Mail(object):
             datetime.strptime(send_at, '%Y-%m-%d %H:%M:%S')
             return True
         except ValueError:
-            raise InvalidParam(
-                message_values=("'send_at'", 'Invalid format, expecting: YYYY-mm-dd HH:MM:SS')
-            )
+            raise InvalidParam(message_values=("'send_at'", 'Invalid format, expecting: YYYY-mm-dd HH:MM:SS'))
 
     def set_attr(self, attr, kwargs):
         if attr in kwargs:
@@ -75,12 +78,61 @@ class Mail(object):
         return email and self.__validate_email(email)
 
     def check_recipient_list(self):
-        exception_reason = "O formato esperado ('ome <email>'; ou '<email>') não foi encontrado"
+        exception_reason = "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
         for recipient in getattr(self, 'recipient_list'):
             if not self.__validate_recipient(recipient):
+                raise InvalidParam(message_values=("'recipient_list'", exception_reason))
+
+    def check_attachment_size(self, file_size, attach_name=None):
+        if file_size >= self.attach_size_limit_b:
+            diff = file_size - self.attach_size_limit_b
+            diff = '%.2f' % (diff / float(1000 * 1000))
+            if attach_name:
+                message = """The size of one of the attachments exceeds the limit of {0} MB allowed.
+                The attachment '{1}' exceeds in {2} MB""".format(
+                    self.attach_size_limit_mb, attach_name, diff)
+            else:
+                message = """The sum of the size of the attachments exceeds the {0} MB allowed.
+                The total exceeds in {1} MB""".format(self.attach_size_limit_mb, diff)
+            raise InvalidParam(message_values=("'attachments'", message))
+
+    def check_attachments(self):
+        if not isinstance(getattr(self, 'attachments'), list):
+            raise InvalidParam(
+                message_values=(
+                    "'attachments'",
+                    "Attachments should be a List of dictionaries. Like: [{name: 'foo.bar', file: 'bWl0dGVwcm8=\n'}]"
+                ))
+        total_attachs_size = 0
+        for attach in getattr(self, 'attachments'):
+            if not isinstance(attach, dict):
                 raise InvalidParam(
-                    message_values=("'recipient_list'", exception_reason)
-                )
+                    message_values=(
+                        "'attachments'",
+                        "Attachments should be a List of dictionaries. "
+                        "Like: [{name: 'foo.bar', file: 'bWl0dGVwcm8=\n'}]"
+                    ))
+            if 'name' not in attach:
+                raise InvalidParam(
+                    message_values=(
+                        "'attachments'",
+                        "Attachment should have an name. Like: {name: 'foo.bar', file: 'bWl0dGVwcm8=\n'}"
+                    ))
+            if 'file' not in attach:
+                raise InvalidParam(
+                    message_values=(
+                        "'attachments'",
+                        "Attachment should have the contents of the file in base64. "
+                        "Like: {name: 'foo.bar', file: 'bWl0dGVwcm8=\n'}"
+                    ))
+            try:
+                dfile = base64.decodestring(attach['file'])
+            except TypeError:
+                raise InvalidParam(message_values=("'attachments'", 'Attachment file should be in base64.'))
+            file_size = len(dfile)
+            self.check_attachment_size(file_size, attach['name'])
+            total_attachs_size += file_size
+        self.check_attachment_size(total_attachs_size)
 
     @staticmethod
     def __mount_param_from(payload):

@@ -11,6 +11,8 @@ try:
     from test_variables import variables
 except ImportError:
     variables = False
+import os
+import base64
 import unittest
 from models import Mail, SearchMailArgs
 from client import MittePro
@@ -35,7 +37,12 @@ class TestAuthentication(unittest.TestCase):
             "message_text": "Using this message instead.",
             "message_html": "<em>Using this message <strong>instead</strong>.</em>",
             "key": '2e7be7ced03535958e35',
-            "secret": 'ca3cdba202104fd88d01'
+            "secret": 'ca3cdba202104fd88d01',
+            "files_names": [
+                # 'foo.pdf',
+                # 'bar.jpg',
+                # 'foo_bar.txt',
+            ]
         }
         self.search_variables = {
             'app_ids': '1001',
@@ -57,10 +64,22 @@ class TestAuthentication(unittest.TestCase):
         if search_variables:
             self.search_variables = search_variables
 
-        self.mittepro = MittePro(key=self.variables['key'], secret=self.variables['secret'], fail_silently=True,
-                                 server_uri=self.server_uri_test, timeout_read=0.001)
+        self.mittepro = MittePro(key=self.variables['key'], secret=self.variables['secret'], fail_silently=False,
+                                 server_uri=self.server_uri_test, timeout_read=20)
+
+    def get_attachments(self):
+        attachments = []
+        files = self.variables['files_names']
+        for dfile in files:
+            content = base64.encodestring(open(
+                os.path.join(os.path.expanduser('~'), 'test_files', dfile), 'rb'
+            ).read())
+            attachments.append({'file': content, 'name': dfile})
+        return attachments
 
     def test_method_post_text(self):
+        # attachments = []
+        attachments = self.get_attachments()
         mail = Mail(
             recipient_list=self.variables['recipients'],
             message_text='Mah oia só https://pypi.org/',
@@ -71,35 +90,42 @@ class TestAuthentication(unittest.TestCase):
             subject="Just a test - Sended From Client AT 09",
             # send_at='2018-02-05 09:32:00',
             activate_tracking=False,
-            track_open=True,
-            track_html_link=True,
-            track_text_link=True,
+            track_open=False,
+            track_html_link=False,
+            track_text_link=False,
+            attachments=attachments
         )
         response = self.mittepro.send(mail)
+        print "response", response
         if response and 'emails_enviados' in response:
             self.assertGreater(len(response['emails_enviados']), 0)
         else:
             self.assertIsNotNone(response)
 
     def test_method_post_template(self):
+        # attachments = []
+        attachments = self.get_attachments()
         mail = Mail(
-            headers={'X_CLIENT_ID': 1},
+            # headers={'X_CLIENT_ID': 1},
             recipient_list=self.variables['recipients'],
             from_name=self.variables['from_name'],
             from_email=self.variables['from_email'],
             template_slug=self.variables['template_slug'],
             context={'foobar': True},
             context_per_recipient=self.variables['context_per_recipient'],
+            subject="Just a test - Sended From Client AT 09",
             # remove comment if you gonna tested
             # message_text=self.variables["message_text"],
             # message_html=self.variables["message_html"],
-            use_tpl_default_subject=True,
-            use_tpl_default_email=True,
-            use_tpl_default_name=True,
-            activate_tracking=True,
-            get_text_from_html=True
+            # use_tpl_default_subject=True,
+            # use_tpl_default_email=True,
+            # use_tpl_default_name=True,
+            # activate_tracking=True,
+            # get_text_from_html=True,
+            attachments=attachments
         )
         response = self.mittepro.send_template(mail)
+        print "response", response
         if response and 'emails_enviados' in response:
             self.assertGreater(len(response['emails_enviados']), 0)
         else:
