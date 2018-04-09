@@ -8,8 +8,8 @@ variables = {
         "foo.bar@gmail.com": {"foo": True},
         "fulano.arquino@gmail.com.br": {"bar": True}
     },
-    "from_name": 'Beutrano',
-    "from_email": 'beutrano@gmail.com',
+    "from_": 'Beutrano <beutrano@mail.com>',
+    "from_2": '<beutrano@mail.com>',
     "template_slug": 'test-101',
     "message_text": "Using this message instead.",
     "message_html": "<em>Using this message <strong>instead</strong>.</em>",

@@ -11,8 +11,9 @@ class Mail(object):
     EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")
 
     def __init__(self, **kwargs):
-        assert 'from_email' in kwargs or item_in_dict(kwargs, 'use_tpl_default_email'), \
-            'Forneça o email do remetente'
+        assert 'from_' in kwargs or item_in_dict(kwargs, 'use_tpl_default_email'), \
+            'Impossível enviar email sem o parâmetro "from". É preciso fornecer o parâmetro "from" ou ' \
+            '"use_tpl_default_email"'
         assert 'recipient_list' in kwargs and len(kwargs.get('recipient_list')), \
             'Impossível enviar um email sem uma lista de destinatários'
         assert 'subject' in kwargs or item_in_dict(kwargs, 'use_tpl_default_subject'), \
@@ -25,8 +26,7 @@ class Mail(object):
         self.set_attr('send_at', kwargs)
         self.validate_send_at(kwargs)
         self.set_attr('subject', kwargs)
-        self.set_attr('from_name', kwargs)
-        self.set_attr('from_email', kwargs)
+        self.set_attr('from_', kwargs)
         self.set_attr('message_text', kwargs)
         self.set_attr('message_html', kwargs)
         self.set_attr('recipient_list', kwargs)
@@ -77,6 +77,11 @@ class Mail(object):
         email = self.__track_email(value)
         return email and self.__validate_email(email)
 
+    def check_from(self):
+        exception_reason = "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
+        if not self.__validate_recipient(getattr(self, 'from_')):
+            raise InvalidParam(message_values=("'from_'", exception_reason))
+
     def check_recipient_list(self):
         exception_reason = "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
         for recipient in getattr(self, 'recipient_list'):
@@ -97,6 +102,11 @@ class Mail(object):
             raise InvalidParam(message_values=("'attachments'", message))
 
     def check_attachments(self):
+        if not hasattr(self, 'attachments'):
+            return True
+        if not getattr(self, 'attachments'):
+            delattr(self, 'attachments')
+            return True
         if not isinstance(getattr(self, 'attachments'), list):
             raise InvalidParam(
                 message_values=(
@@ -134,17 +144,6 @@ class Mail(object):
             total_attachs_size += file_size
         self.check_attachment_size(total_attachs_size)
 
-    @staticmethod
-    def __mount_param_from(payload):
-        payload['from'] = ''
-        if 'from_name' in payload and payload['from_name']:
-            payload['from'] += payload['from_name']
-            del payload['from_name']
-        if 'from_email' in payload and payload['from_email']:
-            payload['from'] += ' <{0}>'.format(payload['from_email'])
-            del payload['from_email']
-        return payload['from'].strip()
-
     def get_payload(self, endpoint='text'):
         if endpoint == 'template':
             if attr_not_in_instance(self, 'template_slug') and attr_not_in_instance(self, 'message_html'):
@@ -157,7 +156,8 @@ class Mail(object):
                 raise AssertionError("Impossível usar os recursos de um template, sem fornecer o 'template_slug'")
 
         payload = self.__dict__
-        payload['from'] = Mail.__mount_param_from(payload)
+        payload['from'] = payload['from_'].strip()
+        del payload['from_']
         payload['sended_by'] = 4
 
         return payload

@@ -12,8 +12,8 @@ variables = {
         "thiago.decastro2@gmail.com": {"foo": True},
         # "thiago.dsn.cir@alterdata.com.br": {"bar": True}
     },
-    "from_name": 'MittePro',
-    "from_email": 'mittepro@alterdata.com.br',
+    "from_": 'MittePro <mittepro@alterdata.com.br>',
+    "from_2": '<mittepro@alterdata.com.br>',
     "template_slug": 'teste-01',
     "message_text": "Using this message instead.",
     "message_html": "<em>Using this message <strong>instead</strong>.</em>",

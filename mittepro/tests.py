@@ -31,8 +31,8 @@ class TestAuthentication(unittest.TestCase):
                 "foo.bar@gmail.com": {"foo": True},
                 "fulano.arquino@gmail.com.br": {"bar": True}
             },
-            "from_name": 'Beutrano',
-            "from_email": 'beutrano@gmail.com',
+            "from_": 'Beutrano <beutrano@mail.com>',
+            "from_2": '<beutrano@mail.com>',
             "template_slug": 'test-101',
             "message_text": "Using this message instead.",
             "message_html": "<em>Using this message <strong>instead</strong>.</em>",
@@ -79,21 +79,20 @@ class TestAuthentication(unittest.TestCase):
 
     def test_method_post_text(self):
         # attachments = []
-        attachments = self.get_attachments()
+        # attachments = self.get_attachments()
         mail = Mail(
             recipient_list=self.variables['recipients'],
             message_text='Mah oia só https://pypi.org/',
             # remove comment if you gonna tested
             # message_html=self.variables["message_html"],
-            from_name=self.variables['from_name'],
-            from_email=self.variables['from_email'],
-            subject="Just a test - Sended From Client AT 09",
+            from_=self.variables['from_2'],
+            subject="Just a test - Sended From_ Client AT 09",
             # send_at='2018-02-05 09:32:00',
             activate_tracking=False,
             track_open=False,
             track_html_link=False,
             track_text_link=False,
-            attachments=attachments
+            # attachments=attachments
         )
         response = self.mittepro.send(mail)
         print "response", response
@@ -108,8 +107,7 @@ class TestAuthentication(unittest.TestCase):
         mail = Mail(
             # headers={'X_CLIENT_ID': 1},
             recipient_list=self.variables['recipients'],
-            from_name=self.variables['from_name'],
-            from_email=self.variables['from_email'],
+            from_=self.variables['from_'],
             template_slug=self.variables['template_slug'],
             context={'foobar': True},
             context_per_recipient=self.variables['context_per_recipient'],
