@@ -103,11 +103,11 @@ class TestAuthentication(unittest.TestCase):
 
     def test_method_post_template(self):
         # attachments = []
-        attachments = self.get_attachments()
+        # attachments = self.get_attachments()
         mail = Mail(
             # headers={'X_CLIENT_ID': 1},
             recipient_list=self.variables['recipients'],
-            from_=self.variables['from_'],
+            # from_=self.variables['from_'],
             template_slug=self.variables['template_slug'],
             context={'foobar': True},
             context_per_recipient=self.variables['context_per_recipient'],
@@ -116,12 +116,13 @@ class TestAuthentication(unittest.TestCase):
             # message_text=self.variables["message_text"],
             # message_html=self.variables["message_html"],
             # use_tpl_default_subject=True,
-            # use_tpl_default_email=True,
+            use_tpl_default_email=True,
             # use_tpl_default_name=True,
             # activate_tracking=True,
             # get_text_from_html=True,
-            attachments=attachments
+            # attachments=attachments
         )
+        # print mail.get_payload()
         response = self.mittepro.send_template(mail)
         print "response", response
         if response and 'emails_enviados' in response:

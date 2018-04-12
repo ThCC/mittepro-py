@@ -156,8 +156,9 @@ class Mail(object):
                 raise AssertionError("Impossível usar os recursos de um template, sem fornecer o 'template_slug'")
 
         payload = self.__dict__
-        payload['from'] = payload['from_'].strip()
-        del payload['from_']
+        if 'from_' in payload:
+            payload['from'] = payload['from_'].strip()
+            del payload['from_']
         payload['sended_by'] = 4
 
         return payload
