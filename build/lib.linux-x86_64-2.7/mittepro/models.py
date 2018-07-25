@@ -8,7 +8,7 @@ from mittepro import item_in_dict, item_not_in_dict, attr_in_instance, attr_not_
 
 class Mail(object):
     TRACK_EMAIL_REGEX = re.compile(r"<.*?(.*).*>")
-    EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")
+    EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 
     def __init__(self, **kwargs):
         assert 'from_' in kwargs or item_in_dict(kwargs, 'use_tpl_default_email'), \
@@ -27,6 +27,7 @@ class Mail(object):
         self.validate_send_at(kwargs)
         self.set_attr('subject', kwargs)
         self.set_attr('from_', kwargs)
+        self.check_from()
         self.set_attr('message_text', kwargs)
         self.set_attr('message_html', kwargs)
         self.set_attr('recipient_list', kwargs)
@@ -57,7 +58,7 @@ class Mail(object):
             datetime.strptime(send_at, '%Y-%m-%d %H:%M:%S')
             return True
         except ValueError:
-            raise InvalidParam(message_values=("'send_at'", 'Invalid format, expecting: YYYY-mm-dd HH:MM:SS'))
+            raise InvalidParam(message_values=("'send_at'", 'Formato inválido, esperado: YYYY-mm-dd HH:MM:SS'))
 
     def set_attr(self, attr, kwargs):
         if attr in kwargs:
@@ -69,36 +70,48 @@ class Mail(object):
             return tracked.group(1)
         return None
 
-    def __validate_email(self, email):
+    def __validate_email(self, value):
+        email = self.__track_email(value)
         valid = self.EMAIL_REGEX.match(email)
         return valid is not None
 
     def __validate_recipient(self, value):
         email = self.__track_email(value)
-        return email and self.__validate_email(email)
+        return email is not None
 
     def check_from(self):
-        exception_reason = "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
         if not self.__validate_recipient(getattr(self, 'from_')):
-            raise InvalidParam(message_values=("'from_'", exception_reason))
+            raise InvalidParam(message_values=(
+                "'from_'", "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
+            ))
+        if not self.__validate_email(getattr(self, 'from_')):
+            raise InvalidParam(message_values=(
+                "'from_'", "O endereço de e-mail do parâmetro 'from_' está inválido"
+            ))
 
     def check_recipient_list(self):
-        exception_reason = "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
         for recipient in getattr(self, 'recipient_list'):
             if not self.__validate_recipient(recipient):
-                raise InvalidParam(message_values=("'recipient_list'", exception_reason))
+                raise InvalidParam(message_values=(
+                    "'recipient_list'", "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
+                ))
+            if not self.__validate_email(recipient):
+                raise InvalidParam(message_values=(
+                    "'recipient_list'", "O item '{0}' contém um endereço de e-mail inválido".format(recipient)
+                ))
 
     def check_attachment_size(self, file_size, attach_name=None):
         if file_size >= self.attach_size_limit_b:
             diff = file_size - self.attach_size_limit_b
             diff = '%.2f' % (diff / float(1000 * 1000))
             if attach_name:
-                message = """The size of one of the attachments exceeds the limit of {0} MB allowed.
-                The attachment '{1}' exceeds in {2} MB""".format(
+                'O tamanho '
+                message = """O tamanho de um dos anexos ultrapassa o limite de {0} MB permitido. O arquivo '{1}'
+                supera em {2} MB""".format(
                     self.attach_size_limit_mb, attach_name, diff)
             else:
-                message = """The sum of the size of the attachments exceeds the {0} MB allowed.
-                The total exceeds in {1} MB""".format(self.attach_size_limit_mb, diff)
+                message = """A soma do tamanho dos anexos ultrapassa o limite de {0} MB permitido.
+                O total supera em {1} MB""".format(self.attach_size_limit_mb, diff)
             raise InvalidParam(message_values=("'attachments'", message))
 
     def check_attachments(self):
@@ -154,6 +167,12 @@ class Mail(object):
                  attr_in_instance(self, 'use_tpl_default_name')) and
                     (attr_not_in_instance(self, 'template_slug'))):
                 raise AssertionError("Impossível usar os recursos de um template, sem fornecer o 'template_slug'")
+        else:
+            if attr_not_in_instance(self, 'attachments') and \
+                    attr_not_in_instance(self, 'message_html') and \
+                    attr_not_in_instance(self, 'message_text'):
+                raise AssertionError('Impossível enviar um email sem conteúdo. É preciso fornecer um dos parâmetros '
+                                     '"message_text", "message_html" ou "attachments"')
 
         payload = self.__dict__
         if 'from_' in payload:

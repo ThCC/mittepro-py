@@ -7,7 +7,7 @@ class BaseError(Exception):
 
 
 class InvalidParam(BaseError):
-    def __init__(self, message="MitteProError - Parameter {0} is invalid. Reason: {1}", codigo=None, message_values=()):
+    def __init__(self, message="MitteProError - Parâmetro {0} é inválido. Razão: {1}", codigo=None, message_values=()):
         self.message_values = message_values
         self.codigo = codigo
         if message_values:
@@ -16,7 +16,7 @@ class InvalidParam(BaseError):
 
 
 class APIError(BaseError):
-    def __init__(self, message="MitteProError. Reason: {0}", codigo=None, message_values=()):
+    def __init__(self, message="MitteProError. Razão: {0}", codigo=None, message_values=()):
         self.message_values = message_values
         self.codigo = codigo
         if message_values:
@@ -25,8 +25,8 @@ class APIError(BaseError):
 
 
 class TimeoutError(BaseError):
-    def __init__(self, message="MitteProError. Reason: The server did not respond within the time you stipulated. "
-                               "The time was {0} second(s)", codigo=None, message_values=()):
+    def __init__(self, message="MitteProError. Razão: O servidor não respondeu dentro do tempo que você estipulou. "
+                               "O tempo foi de {0} segundo(s)", codigo=None, message_values=()):
         self.message_values = message_values
         self.codigo = codigo
         if message_values:
@@ -35,7 +35,7 @@ class TimeoutError(BaseError):
 
 
 class ImproperlyConfigured(BaseError):
-    def __init__(self, message="MitteProError. Improper configuration. Reason: {0}", codigo=None, message_values=()):
+    def __init__(self, message="MitteProError. Configuração inapropriada. Razão: {0}", codigo=None, message_values=()):
         self.message_values = message_values
         self.codigo = codigo
         if message_values:

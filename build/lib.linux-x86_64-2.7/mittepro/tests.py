@@ -24,8 +24,8 @@ class TestAuthentication(unittest.TestCase):
         self.variables = {
             "recipients": [
                 "Foo Bar <foo.bar@gmail.com>",
-                "Fulano Aquino <fulano.aquino@gmail.com>",
-                "<ciclano.norego@gmail.com>"
+                "Fulano Aquino <fulano@gmail.com>",
+                "<ciclano@gmail.com>"
             ],
             "context_per_recipient": {
                 "foo.bar@gmail.com": {"foo": True},
@@ -85,7 +85,7 @@ class TestAuthentication(unittest.TestCase):
             message_text='Mah oia só https://pypi.org/',
             # remove comment if you gonna tested
             # message_html=self.variables["message_html"],
-            from_=self.variables['from_2'],
+            from_=self.variables['from_'],
             subject="Just a test - Sended From_ Client AT 09",
             # send_at='2018-02-05 09:32:00',
             activate_tracking=False,

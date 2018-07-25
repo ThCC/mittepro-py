@@ -1,8 +1,8 @@
 variables = {
     "recipients": [
         "Foo Bar <foo.bar@gmail.com>",
-        "Fulano Aquino <fulano.aquino@gmail.com>",
-        "<ciclano.norego@gmail.com>"
+        "Fulano Aquino <fulano@gmail.com>",
+        "<ciclano@gmail.com>"
     ],
     "context_per_recipient": {
         "foo.bar@gmail.com": {"foo": True},

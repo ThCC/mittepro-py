@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: mittepro
-Version: 1.4.2
+Version: 1.5.0
 Summary: MittePro is a powerful marketing tool with features to help companies with their marketing goals and deliver emails from their websites and apps.
 Home-page: https://github.com/ThCC/mittepro-py
 Author: Thiago Cardoso de Castro
@@ -29,8 +29,8 @@ Description: Client service, to send simple text emails or, using a template cre
                 mail = Mail(
                     recipient_list=[
                         'Foo Bar <foo.bar@gmail.com>',
-                        'Fulano Aquino <fulano.aquino@gmail.com>',
-                        '<ciclano.norego@gmail.com>'
+                        'Fulano Aquino <fulano@gmail.com>',
+                        '<ciclano@gmail.com>'
                     ],
                     message="Just a Test, delete if you want.",
                     from_='Beutrano <beutrano@mail.com>',
@@ -49,8 +49,8 @@ Description: Client service, to send simple text emails or, using a template cre
                 mail = Mail(
                     recipient_list=[
                         'Foo Bar <foo.bar@gmail.com>',
-                        'Fulano Aquino <fulano.aquino@gmail.com>',
-                        '<ciclano.norego@gmail.com>'
+                        'Fulano Aquino <fulano@gmail.com>',
+                        '<ciclano@gmail.com>'
                     ],
                     from_='Beutrano <beutrano@mail.com>',
                     template_slug='test-101',
