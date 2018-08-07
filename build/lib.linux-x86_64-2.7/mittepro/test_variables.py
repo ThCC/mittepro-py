@@ -1,7 +1,7 @@
 variables = {
     "recipients": [
         "Thiago de Castro <thiago.decastro2@gmail.com>",
-        # "Thiago C de Castro <THIAGO.DSN.cir@ALTERDATA.COM.BR>",
+        "Thiago C de Castro <THIAGO.DSN.cir@ALTERDATA.COM.BR>",
         # "<success@simulator.amazonses.com>",
         # "<bounce@simulator.amazonses.com>",
         # "<ooto@simulator.amazonses.com>",
@@ -12,6 +12,8 @@ variables = {
         "thiago.decastro2@gmail.com": {"foo": True},
         # "thiago.dsn.cir@alterdata.com.br": {"bar": True}
     },
+    'batchs': 2,
+    'time_between_batchs': 5,
     "from_": 'MittePro <mittepro@alterdata.com.br>',
     "from_2": '<mittepro@alterdata.com.br>',
     "template_slug": 'teste-01',

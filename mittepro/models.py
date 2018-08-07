@@ -18,6 +18,9 @@ class Mail(object):
             'Impossível enviar um email sem uma lista de destinatários'
         assert 'subject' in kwargs or item_in_dict(kwargs, 'use_tpl_default_subject'), \
             'Impossível enviar um email sem um assunto'
+        self.batch_min_size = 2
+        self.batch_min_time = 5
+        self.total_email_limit = 500
         self.attach_size_limit_mb = 10
         self.attach_size_limit_b = self.attach_size_limit_mb * 1024 * 1024
 
@@ -37,6 +40,9 @@ class Mail(object):
         self.set_attr('track_html_link', kwargs)
         self.set_attr('track_text_link', kwargs)
         self.set_attr('get_text_from_html', kwargs)
+        self.set_attr('batchs', kwargs)
+        self.set_attr('time_between_batchs', kwargs)
+        self.check_batchs_args()
         self.set_attr('attachments', kwargs)
         self.check_attachments()
         # self.set_attr('expose_recipients_list', kwargs)
@@ -100,6 +106,14 @@ class Mail(object):
                     "'recipient_list'", "O item '{0}' contém um endereço de e-mail inválido".format(recipient)
                 ))
 
+        total_recipients = len(getattr(self, 'recipient_list'))
+        if total_recipients > self.total_email_limit:
+            raise InvalidParam(message_values=(
+                'recipient_list',
+                'Não é possível enviar mais de {0} de contatos sem fornecer o parâmetro '
+                '"batch" com o mínimo valor de 2'.format(self.total_email_limit)
+            ))
+
     def check_attachment_size(self, file_size, attach_name=None):
         if file_size >= self.attach_size_limit_b:
             diff = file_size - self.attach_size_limit_b
@@ -156,6 +170,49 @@ class Mail(object):
             self.check_attachment_size(file_size, attach['name'])
             total_attachs_size += file_size
         self.check_attachment_size(total_attachs_size)
+
+    def check_batchs_args(self):
+        batchs = getattr(self, 'batchs', None)
+        time_between_batchs = getattr(self, 'time_between_batchs', None)
+
+        if not batchs:
+            raise InvalidParam(message_values=('batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
+        if batchs < self.batch_min_size:
+            raise InvalidParam(message_values=('batchs', 'O parâmetro está com um valor menor que 2'))
+        if not time_between_batchs:
+            raise InvalidParam(message_values=(
+                'time_between_batchs', 'O parâmetro não foi fornecido ou o valor é inválido'
+            ))
+        if time_between_batchs < self.batch_min_time:
+            raise InvalidParam(message_values=('time_between_batchs', 'O parâmetro está com um valor menor que 5'))
+
+        batchs = int(batchs)
+        temp_time = int(time_between_batchs)
+        time_between_batchs = self.batch_min_time * (temp_time / self.batch_min_time)
+
+        if not batchs:
+            raise InvalidParam(message_values=('batchs', 'O parâmetro "batch" está com um valor menor que 2'))
+        if not time_between_batchs:
+            raise InvalidParam(message_values=(
+                'time_between_batchs', 'O parâmetro "time_between_batchs" está com um valor menor que 5'
+            ))
+
+        total_recipients = len(getattr(self, 'recipient_list'))
+        batchs_size = total_recipients / batchs
+        if batchs_size > self.total_email_limit:
+            raise InvalidParam(message_values=(
+                'batchs', 'O tamanho dos lotes ("batchs") supera o limite '
+                          'de {0} e-mails'.format(self.total_email_limit)
+            ))
+        if batchs_size * batchs != total_recipients:
+            raise InvalidParam(message_values=(
+                'batchs',
+                'A distribuição entre os lotes está inválida, provavelmente a quantidade de '
+                'destinatários não é multiplo da quantidade de lotes'
+            ))
+
+        setattr(self, 'batchs', batchs)
+        setattr(self, 'time_between_batchs', time_between_batchs)
 
     def get_payload(self, endpoint='text'):
         if endpoint == 'template':
