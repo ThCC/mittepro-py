@@ -86,8 +86,8 @@ class TestAuthentication(unittest.TestCase):
             # remove comment if you gonna tested
             # message_html=self.variables["message_html"],
             from_=self.variables['from_'],
-            batchs=self.variables['batchs'],
-            time_between_batchs=self.variables['time_between_batchs'],
+            # batchs=self.variables['batchs'],
+            # time_between_batchs=self.variables['time_between_batchs'],
             subject="Just a test - Sended From_ Client AT 09",
             # send_at='2018-02-05 09:32:00',
             activate_tracking=False,

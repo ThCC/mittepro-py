@@ -175,6 +175,9 @@ class Mail(object):
         batchs = getattr(self, 'batchs', None)
         time_between_batchs = getattr(self, 'time_between_batchs', None)
 
+        if not batchs and not time_between_batchs:
+            return True
+
         if not batchs:
             raise InvalidParam(message_values=('batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
         if batchs < self.batch_min_size:
