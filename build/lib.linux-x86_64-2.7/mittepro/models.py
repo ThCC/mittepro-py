@@ -86,6 +86,9 @@ class Mail(object):
         return email is not None
 
     def check_from(self):
+        if not hasattr(self, 'from_'):
+            return True
+
         if not self.__validate_recipient(getattr(self, 'from_')):
             raise InvalidParam(message_values=(
                 "'from_'", "O formato esperado ('nome <email>'; ou '<email>') não foi encontrado"
@@ -174,6 +177,7 @@ class Mail(object):
     def check_batchs_args(self):
         batchs = getattr(self, 'batchs', None)
         time_between_batchs = getattr(self, 'time_between_batchs', None)
+        headers = getattr(self, 'headers', None)
 
         if not batchs and not time_between_batchs:
             return True
@@ -189,6 +193,13 @@ class Mail(object):
         if time_between_batchs < self.batch_min_time:
             raise InvalidParam(message_values=('time_between_batchs', 'O parâmetro está com um valor menor que 5'))
 
+        last_batch_plus_one, system_take_over = None, None
+        if headers:
+            if 'system_take_over' in headers:
+                system_take_over = headers['system_take_over']
+            if 'last_batch_plus_one' in headers:
+                last_batch_plus_one = headers['last_batch_plus_one']
+
         batchs = int(batchs)
         temp_time = int(time_between_batchs)
         time_between_batchs = self.batch_min_time * (temp_time / self.batch_min_time)
@@ -200,19 +211,20 @@ class Mail(object):
                 'time_between_batchs', 'O parâmetro "time_between_batchs" está com um valor menor que 5'
             ))
 
-        total_recipients = len(getattr(self, 'recipient_list'))
-        batchs_size = total_recipients / batchs
-        if batchs_size > self.total_email_limit:
-            raise InvalidParam(message_values=(
-                'batchs', 'O tamanho dos lotes ("batchs") supera o limite '
-                          'de {0} e-mails'.format(self.total_email_limit)
-            ))
-        if batchs_size * batchs != total_recipients:
-            raise InvalidParam(message_values=(
-                'batchs',
-                'A distribuição entre os lotes está inválida, provavelmente a quantidade de '
-                'destinatários não é multiplo da quantidade de lotes'
-            ))
+        if last_batch_plus_one is not None or system_take_over is not None:
+            total_recipients = len(getattr(self, 'recipient_list'))
+            batchs_size = total_recipients / batchs
+            if batchs_size > self.total_email_limit:
+                raise InvalidParam(message_values=(
+                    'batchs', 'O tamanho dos lotes ("batchs") supera o limite '
+                              'de {0} e-mails'.format(self.total_email_limit)
+                ))
+            if batchs_size * batchs != total_recipients:
+                raise InvalidParam(message_values=(
+                    'batchs',
+                    'A distribuição entre os lotes está inválida, provavelmente a quantidade de '
+                    'destinatários não é multiplo da quantidade de lotes'
+                ))
 
         setattr(self, 'batchs', batchs)
         setattr(self, 'time_between_batchs', time_between_batchs)
