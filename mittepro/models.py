@@ -26,35 +26,35 @@ class Mail(object):
 
         # General mail vars
         self.set_attr('tags', kwargs)
+        self.set_attr('batchs', kwargs)
+        self.set_attr('headers', kwargs)
+        self.set_attr('recipient_list', kwargs)
+        self.set_attr('time_between_batchs', kwargs)
         self.set_attr('send_at', kwargs)
-        self.validate_send_at(kwargs)
         self.set_attr('subject', kwargs)
         self.set_attr('from_', kwargs)
-        self.check_from()
         self.set_attr('message_text', kwargs)
         self.set_attr('message_html', kwargs)
-        self.set_attr('recipient_list', kwargs)
-        self.check_recipient_list()
         self.set_attr('activate_tracking', kwargs)
         self.set_attr('track_open', kwargs)
         self.set_attr('track_html_link', kwargs)
         self.set_attr('track_text_link', kwargs)
         self.set_attr('get_text_from_html', kwargs)
-        self.set_attr('batchs', kwargs)
-        self.set_attr('time_between_batchs', kwargs)
-        self.check_batchs_args()
         self.set_attr('attachments', kwargs)
-        self.check_attachments()
-        # self.set_attr('expose_recipients_list', kwargs)
 
         # Template mail vars
-        self.set_attr('headers', kwargs)
         self.set_attr('context', kwargs)
         self.set_attr('template_slug', kwargs)
         self.set_attr('use_tpl_default_name', kwargs)
         self.set_attr('use_tpl_default_email', kwargs)
         self.set_attr('use_tpl_default_subject', kwargs)
         self.set_attr('context_per_recipient', kwargs)
+
+        self.check_batchs_args()
+        self.validate_send_at(kwargs)
+        self.check_from()
+        self.check_recipient_list()
+        self.check_attachments()
 
     def validate_send_at(self, kwargs):
         send_at = kwargs.get('send_at')
@@ -109,8 +109,10 @@ class Mail(object):
                     "'recipient_list'", "O item '{0}' contém um endereço de e-mail inválido".format(recipient)
                 ))
 
+        batchs = getattr(self, 'batchs', None)
+
         total_recipients = len(getattr(self, 'recipient_list'))
-        if total_recipients > self.total_email_limit:
+        if total_recipients > self.total_email_limit and batchs is None:
             raise InvalidParam(message_values=(
                 'recipient_list',
                 'Não é possível enviar mais de {0} de contatos sem fornecer o parâmetro '
@@ -182,9 +184,14 @@ class Mail(object):
         if not batchs and not time_between_batchs:
             return True
 
-        if not batchs:
+        system_takes_over_batchs = None
+        if headers:
+            if 'system_takes_over_batchs' in headers and headers['system_takes_over_batchs']:
+                system_takes_over_batchs = headers['system_takes_over_batchs']
+
+        if not system_takes_over_batchs and not batchs:
             raise InvalidParam(message_values=('batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
-        if batchs < self.batch_min_size:
+        if not system_takes_over_batchs and batchs < self.batch_min_size:
             raise InvalidParam(message_values=('batchs', 'O parâmetro está com um valor menor que 2'))
         if not time_between_batchs:
             raise InvalidParam(message_values=(
@@ -193,25 +200,18 @@ class Mail(object):
         if time_between_batchs < self.batch_min_time:
             raise InvalidParam(message_values=('time_between_batchs', 'O parâmetro está com um valor menor que 5'))
 
-        last_batch_plus_one, system_take_over = None, None
-        if headers:
-            if 'system_take_over' in headers:
-                system_take_over = headers['system_take_over']
-            if 'last_batch_plus_one' in headers:
-                last_batch_plus_one = headers['last_batch_plus_one']
-
         batchs = int(batchs)
         temp_time = int(time_between_batchs)
         time_between_batchs = self.batch_min_time * (temp_time / self.batch_min_time)
 
-        if not batchs:
+        if not batchs and not system_takes_over_batchs:
             raise InvalidParam(message_values=('batchs', 'O parâmetro "batch" está com um valor menor que 2'))
         if not time_between_batchs:
             raise InvalidParam(message_values=(
                 'time_between_batchs', 'O parâmetro "time_between_batchs" está com um valor menor que 5'
             ))
 
-        if last_batch_plus_one is not None or system_take_over is not None:
+        if system_takes_over_batchs is None:
             total_recipients = len(getattr(self, 'recipient_list'))
             batchs_size = total_recipients / batchs
             if batchs_size > self.total_email_limit:
