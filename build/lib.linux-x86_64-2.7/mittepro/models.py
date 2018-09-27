@@ -109,10 +109,15 @@ class Mail(object):
                     "'recipient_list'", "O item '{0}' contém um endereço de e-mail inválido".format(recipient)
                 ))
 
+        system_takes_over_batchs = None
         batchs = getattr(self, 'batchs', None)
+        headers = getattr(self, 'headers', None)
+        if headers:
+            if 'system_takes_over_batchs' in headers and headers['system_takes_over_batchs']:
+                system_takes_over_batchs = headers['system_takes_over_batchs']
 
         total_recipients = len(getattr(self, 'recipient_list'))
-        if total_recipients > self.total_email_limit and batchs is None:
+        if total_recipients > self.total_email_limit and batchs is None and system_takes_over_batchs is None:
             raise InvalidParam(message_values=(
                 'recipient_list',
                 'Não é possível enviar mais de {0} de contatos sem fornecer o parâmetro '
