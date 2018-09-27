@@ -30,6 +30,7 @@ class Mail(object):
         self.set_attr('headers', kwargs)
         self.set_attr('recipient_list', kwargs)
         self.set_attr('time_between_batchs', kwargs)
+        self.set_attr('recipients_per_batchs', kwargs)
         self.set_attr('send_at', kwargs)
         self.set_attr('subject', kwargs)
         self.set_attr('from_', kwargs)
@@ -183,21 +184,13 @@ class Mail(object):
 
     def check_batchs_args(self):
         batchs = getattr(self, 'batchs', None)
-        time_between_batchs = getattr(self, 'time_between_batchs', None)
         headers = getattr(self, 'headers', None)
+        time_between_batchs = getattr(self, 'time_between_batchs', None)
+        recipients_per_batchs = getattr(self, 'recipients_per_batchs', None)
 
-        if not batchs and not time_between_batchs:
+        if not batchs and not time_between_batchs and not recipients_per_batchs:
             return True
 
-        system_takes_over_batchs = None
-        if headers:
-            if 'system_takes_over_batchs' in headers and headers['system_takes_over_batchs']:
-                system_takes_over_batchs = headers['system_takes_over_batchs']
-
-        if not system_takes_over_batchs and not batchs:
-            raise InvalidParam(message_values=('batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
-        if not system_takes_over_batchs and batchs < self.batch_min_size:
-            raise InvalidParam(message_values=('batchs', 'O parâmetro está com um valor menor que 2'))
         if not time_between_batchs:
             raise InvalidParam(message_values=(
                 'time_between_batchs', 'O parâmetro não foi fornecido ou o valor é inválido'
@@ -205,19 +198,42 @@ class Mail(object):
         if time_between_batchs < self.batch_min_time:
             raise InvalidParam(message_values=('time_between_batchs', 'O parâmetro está com um valor menor que 5'))
 
-        batchs = int(batchs)
         temp_time = int(time_between_batchs)
         time_between_batchs = self.batch_min_time * (temp_time / self.batch_min_time)
 
-        if not batchs and not system_takes_over_batchs:
-            raise InvalidParam(message_values=('batchs', 'O parâmetro "batch" está com um valor menor que 2'))
         if not time_between_batchs:
             raise InvalidParam(message_values=(
                 'time_between_batchs', 'O parâmetro "time_between_batchs" está com um valor menor que 5'
             ))
+        setattr(self, 'time_between_batchs', time_between_batchs)
 
-        if system_takes_over_batchs is None:
-            total_recipients = len(getattr(self, 'recipient_list'))
+        system_takes_over_batchs = None
+        if headers:
+            if item_in_dict(headers, 'system_takes_over_batchs'):
+                system_takes_over_batchs = headers['system_takes_over_batchs']
+
+        if system_takes_over_batchs:
+            return True
+
+        if not batchs and not recipients_per_batchs:
+            raise InvalidParam(
+                message="MitteProError - Parâmetros {0} são inválidos. Razão: {1}",
+                message_values=(
+                    'batchs e recipients_per_batchs',
+                    'Não é possível enviar mais de {0} de contatos sem fornecer o parâmetro "batch" '
+                    'ou o "recipients_per_batch" com o mínimo valor de 2'.format(self.total_email_limit)
+                ))
+
+        total_recipients = len(getattr(self, 'recipient_list'))
+        if batchs:
+            if batchs < self.batch_min_size:
+                raise InvalidParam(message_values=('batchs', 'O parâmetro está com um valor menor que 2'))
+            try:
+                batchs = int(batchs)
+                if not batchs:
+                    raise InvalidParam(message_values=('batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
+            except ValueError:
+                raise InvalidParam(message_values=('batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
             batchs_size = total_recipients / batchs
             if batchs_size > self.total_email_limit:
                 raise InvalidParam(message_values=(
@@ -230,9 +246,26 @@ class Mail(object):
                     'A distribuição entre os lotes está inválida, provavelmente a quantidade de '
                     'destinatários não é multiplo da quantidade de lotes'
                 ))
+            setattr(self, 'batchs', batchs)
 
-        setattr(self, 'batchs', batchs)
-        setattr(self, 'time_between_batchs', time_between_batchs)
+        if recipients_per_batchs:
+            if recipients_per_batchs < self.batch_min_size:
+                raise InvalidParam(message_values=(
+                    'recipients_per_batchs', 'O parâmetro está com um valor menor que 2'))
+            try:
+                recipients_per_batchs = int(recipients_per_batchs)
+                if not recipients_per_batchs:
+                    raise InvalidParam(message_values=(
+                        'recipients_per_batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
+            except ValueError:
+                raise InvalidParam(message_values=(
+                    'recipients_per_batchs', 'O parâmetro não foi fornecido ou o valor é inválido'))
+            if recipients_per_batchs > total_recipients:
+                raise InvalidParam(message_values=(
+                    'recipients_per_batchs',
+                    'O valor do parâmetro "recipients_per_batchs" é maior que a quantidade de destinatários'
+                ))
+            setattr(self, 'recipients_per_batchs', recipients_per_batchs)
 
     def get_payload(self, endpoint='text'):
         if endpoint == 'template':

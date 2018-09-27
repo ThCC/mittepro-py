@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='1.7.2',
+    version='1.8.0',
     install_requires=[
         'requests==2.18.4',
         'simplejson==3.6.4',
@@ -33,4 +33,5 @@ setup(
 )
 
 # python setup.py sdist bdist_wheel
-# twine upload dist/*
+# twine upload dist/mittepro-x.y.z.tar.gz
+# twine upload dist/mittepro-x.y.z-py2-none-any.whl
