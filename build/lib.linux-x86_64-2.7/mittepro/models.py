@@ -184,7 +184,7 @@ class Mail(object):
 
     def check_batchs_args(self):
         batchs = getattr(self, 'batchs', None)
-        headers = getattr(self, 'headers', None)
+        headers = getattr(self, 'headers', {})
         time_between_batchs = getattr(self, 'time_between_batchs', None)
         recipients_per_batchs = getattr(self, 'recipients_per_batchs', None)
 
@@ -253,6 +253,13 @@ class Mail(object):
                     'batchs', 'O tamanho dos lotes ("batchs") supera o limite '
                               'de {0} e-mails'.format(self.total_email_limit)
                 ))
+
+            remaining = total_recipients % batchs
+            last_batch_plus_one = item_in_dict(headers, 'last_batch_plus_one')
+
+            if remaining and last_batch_plus_one:
+                return True
+
             if batchs_size * batchs != total_recipients:
                 raise InvalidParam(message_values=(
                     'batchs',
