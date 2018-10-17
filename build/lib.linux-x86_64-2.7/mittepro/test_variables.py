@@ -35,7 +35,7 @@ variables = {
         # 'foo.txt',
     ]
 }
-server_uri_test = 'http://172.16.72.2:8001'
+server_uri_test = 'http://0.0.0.0:8000'
 search_variables = {
     'app_ids': '1001',
     'start': '2017-02-27',

@@ -7,8 +7,16 @@ from apysignature.signature import Request as Request_sig, Token
 from requests import Request, Session, ReadTimeout, ConnectTimeout, HTTPError
 
 __author__ = 'thiagocdecastro'
-__version__ = '1.8.2'
+__version__ = '1.8.3'
 logging.basicConfig(format='%(asctime)s %(message)s')
+
+
+def is_json(value):
+    try:
+        parsed = json.loads(value)
+        return True
+    except Exception:
+        return False
 
 
 def item_in_dict(dictionary, item):
@@ -125,8 +133,11 @@ class Api(object):
                 response = json.loads(response.content)
             elif status_code not in valid_codes:
                 logging.info("EXTERNAL API: request error: {0}".format(response.reason))
-                content = json.loads(response.content)
-                msg = content['error'] if 'error' in content else content['detail']
+                if is_json(response.content):
+                    content = json.loads(response.content)
+                    msg = content['error'] if 'error' in content else content['detail']
+                else:
+                    msg = response.content[0:response.content.index('Request Method')].strip()
                 if not self.fail_silently:
                     raise APIError(message_values=(msg.encode('utf8'),))
                 response = {'error': msg.encode('utf8')}
