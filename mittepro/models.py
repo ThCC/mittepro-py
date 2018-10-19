@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import arrow
 import base64
 from datetime import datetime
 from mittepro.exceptions import InvalidParam
@@ -63,9 +64,13 @@ class Mail(object):
             return True
         try:
             datetime.strptime(send_at, '%Y-%m-%d %H:%M:%S')
-            return True
         except ValueError:
             raise InvalidParam(message_values=("'send_at'", 'Formato inválido, esperado: YYYY-mm-dd HH:MM:SS'))
+
+        date_target = arrow.get(send_at + '-03:00', 'YYYY-MM-DD HH:mm:ssZZ')
+        if arrow.now(tz='America/Sao_Paulo') <= date_target:
+            return True
+        raise InvalidParam(message_values=("'send_at'", 'O valor para data tem que ser maior do que a atual'))
 
     def set_attr(self, attr, kwargs):
         if attr in kwargs:

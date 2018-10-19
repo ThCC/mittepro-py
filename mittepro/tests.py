@@ -89,6 +89,7 @@ class TestAuthentication(unittest.TestCase):
             # batchs=self.variables['batchs'],
             # time_between_batchs=self.variables['time_between_batchs'],
             subject="Just a test - Sended From_ Client AT 09",
+            send_at='2018-11-16 10:45',
             # send_at='2018-02-05 09:32:00',
             activate_tracking=False,
             track_open=False,
