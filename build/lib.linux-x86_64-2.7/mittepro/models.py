@@ -94,6 +94,9 @@ class Mail(object):
     def check_from(self):
         if not hasattr(self, 'from_'):
             return True
+        if not getattr(self, 'from_'):
+            delattr(self, 'from_')
+            return True
 
         if not self.__validate_recipient(getattr(self, 'from_')):
             raise InvalidParam(message_values=(
@@ -299,7 +302,7 @@ class Mail(object):
                                      '"message_text", "message_html" ou "attachments"')
 
         payload = self.__dict__
-        if 'from_' in payload:
+        if 'from_' in payload and payload['from_']:
             payload['from'] = payload['from_'].strip()
             del payload['from_']
         payload['sended_by'] = 4
