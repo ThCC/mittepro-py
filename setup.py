@@ -5,18 +5,18 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='1.8.6',
+    version='2.0.0',
     install_requires=[
-        'requests==2.18.4',
-        'simplejson==3.6.4',
-        'apysignature==0.1.3',
+        'requests==2.21.0',
+        'simplejson==3.16.0',
+        'apysignature==0.2.0',
     ],
     url='https://github.com/ThCC/mittepro-py',
     description='MittePro is a powerful marketing tool with features to help companies with their marketing goals and deliver emails from their websites and apps.',
     long_description=open("README.rst").read(),
     packages=find_packages(),
     include_package_data=True,
-    python_requires='>=2.7',
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     license='Apache-2.0',
     classifiers=[
         'Environment :: Web Environment',

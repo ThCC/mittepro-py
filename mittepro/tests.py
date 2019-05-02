@@ -14,8 +14,8 @@ except ImportError:
 import os
 import base64
 import unittest
-from models import Mail, SearchMailArgs
-from client import MittePro
+from .models import Mail, SearchMailArgs
+from .client import MittePro
 
 
 class TestAuthentication(unittest.TestCase):
@@ -98,7 +98,7 @@ class TestAuthentication(unittest.TestCase):
             # attachments=attachments
         )
         response = self.mittepro.send(mail)
-        print "response", response
+        print("response", response)
         if response and 'emails_enviados' in response:
             self.assertGreater(len(response['emails_enviados']), 0)
         else:
@@ -127,7 +127,7 @@ class TestAuthentication(unittest.TestCase):
         )
         # print mail.get_payload()
         response = self.mittepro.send_template(mail)
-        print "response", response
+        print("response", response)
         if response and 'emails_enviados' in response:
             self.assertGreater(len(response['emails_enviados']), 0)
         else:

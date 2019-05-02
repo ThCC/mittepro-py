@@ -120,9 +120,9 @@ class Mail(object):
 
         system_takes_over_batchs = None
         batchs = getattr(self, 'batchs', None)
-        headers = getattr(self, 'headers', None)
+        headers = getattr(self, 'headers', {})
         if headers:
-            if 'system_takes_over_batchs' in headers and headers['system_takes_over_batchs']:
+            if 'system_takes_over_batchs' in str(headers) and headers['system_takes_over_batchs']:
                 system_takes_over_batchs = headers['system_takes_over_batchs']
 
         total_recipients = len(getattr(self, 'recipient_list'))
