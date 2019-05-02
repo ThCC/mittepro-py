@@ -6,7 +6,6 @@ mittepro/__init__.py
 mittepro/client.py
 mittepro/exceptions.py
 mittepro/models.py
-mittepro/test_variables.py
 mittepro/tests.py
 mittepro.egg-info/PKG-INFO
 mittepro.egg-info/SOURCES.txt
