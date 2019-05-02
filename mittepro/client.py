@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
-from models import SearchMailArgs
-from mittepro import endpoint, Api
-from mittepro.exceptions import ImproperlyConfigured
+from . import endpoint, Api
+from .models import SearchMailArgs
+from .exceptions import ImproperlyConfigured
 
 
 class MittePro(Api):
