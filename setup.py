@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='2.0.0',
+    version='2.1.0',
     install_requires=[
         'requests==2.21.0',
         'simplejson==3.16.0',

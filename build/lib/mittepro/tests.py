@@ -24,12 +24,12 @@ class TestAuthentication(unittest.TestCase):
         self.variables = {
             "recipients": [
                 "Foo Bar <foo.bar@gmail.com>",
-                "Fulano Aquino <fulano@gmail.com>",
+                "Fulano <fulano@gmail.com>",
                 "<ciclano@gmail.com>"
             ],
             "context_per_recipient": {
                 "foo.bar@gmail.com": {"foo": True},
-                "fulano.arquino@gmail.com.br": {"bar": True}
+                "fulano@gmail.com.br": {"bar": True}
             },
             "from_": 'Beutrano <beutrano@mail.com>',
             "from_2": '<beutrano@mail.com>',

@@ -20,7 +20,7 @@ Follow the examples below to send simple emails or emails with templates:
         mail = Mail(
             recipient_list=[
                 'Foo Bar <foo.bar@gmail.com>',
-                'Fulano Aquino <fulano@gmail.com>',
+                'Fulano <fulano@gmail.com>',
                 '<ciclano@gmail.com>'
             ],
             message="Just a Test, delete if you want.",
@@ -40,7 +40,7 @@ Follow the examples below to send simple emails or emails with templates:
         mail = Mail(
             recipient_list=[
                 'Foo Bar <foo.bar@gmail.com>',
-                'Fulano Aquino <fulano@gmail.com>',
+                'Fulano <fulano@gmail.com>',
                 '<ciclano@gmail.com>'
             ],
             from_='Beutrano <beutrano@mail.com>',
@@ -48,7 +48,7 @@ Follow the examples below to send simple emails or emails with templates:
             context={'foobar': True},
             context_per_recipient={
                 "foo.bar@gmail.com": {"foo": True},
-                "fulano.arquino@gmail.com.br": {"bar": True}
+                "fulano@gmail.com.br": {"bar": True}
             },
             use_tpl_default_subject=True,
             use_tpl_default_email=False,

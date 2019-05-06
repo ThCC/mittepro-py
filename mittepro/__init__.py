@@ -7,7 +7,7 @@ from apysignature.signature import Request as Request_sig, Token
 from requests import Request, Session, ReadTimeout, ConnectTimeout, HTTPError
 
 __author__ = 'thiagocdecastro'
-__version__ = '2.0.0'
+__version__ = '2.1.0'
 logging.basicConfig(format='%(asctime)s %(message)s')
 
 
@@ -129,15 +129,15 @@ class Api(object):
             else:
                 status_code = response.status_code
 
-            if response and status_code in valid_codes and response.content:
-                response = json.loads(response.content)
+            if response and status_code in valid_codes and response.text:
+                response = json.loads(response.text)
             elif status_code not in valid_codes:
                 logging.info("EXTERNAL API: request error: {0}".format(response.reason))
-                if is_json(response.content):
-                    content = json.loads(response.content)
+                if is_json(response.text):
+                    content = json.loads(response.text)
                     msg = content['error'] if 'error' in content else content['detail']
                 else:
-                    msg = response.content[0:response.content.index('Request Method')].strip()
+                    msg = response.text[0:response.text.index('Request Method')].strip()
                 if not self.fail_silently:
                     raise APIError(message_values=(msg.encode('utf8'),))
                 response = {'error': msg.encode('utf8')}
