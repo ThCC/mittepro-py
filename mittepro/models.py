@@ -104,7 +104,7 @@ class Mail(object):
                 ))
             if not self.__validate_email(recipient):
                 raise InvalidParam(message_values=(
-                    "'recipient_list'", "O item '{0}' contém um endereço de e-mail inválido".format(recipient)
+                    "'recipient_list'", "O item '{0}' contém um endereço de e-mail inválido".format(recipient)))
 
     def get_payload(self, endpoint='text'):
         if endpoint == 'template':
