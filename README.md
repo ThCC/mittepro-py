@@ -7,6 +7,11 @@ In order to use this library, you must create an account in MittePro.
 How to install:
 
     pip install mittepro
+    
+** **If your application uses python 2.*** **
+
+It's better change one of the packages in the requirements.txt. The `apysignature` it's not compatible with python 2.*, in it's final version, so I recommend using the version 0.1.3.
+
 
 ** **If your application uses python 2.*** **
 
