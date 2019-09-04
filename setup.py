@@ -5,12 +5,13 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='2.2.1',
+    version='2.2.2',
     install_requires=[
+        'arrow>=0.12.1',
+        'six>=1.12.0',
         'requests==2.21.0',
         'simplejson==3.16.0',
         'apysignature==0.2.1',
-        'six==1.12.0',
     ],
     url='https://github.com/ThCC/mittepro-py',
     description='MittePro is a powerful marketing tool with features to help companies with their marketing goals and deliver emails from their websites and apps.',
@@ -34,6 +35,7 @@ setup(
     author_email='thiago.decastro2@gmail.com',
 )
 
+# python setup.py bdist_egg
 # python setup.py sdist bdist_wheel
 # twine upload dist/mittepro-x.y.z.tar.gz
 # twine upload dist/mittepro-x.y.z-py2-none-any.whl
