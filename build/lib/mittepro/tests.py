@@ -14,11 +14,11 @@ except ImportError:
 import os
 import base64
 import unittest
-from .models import Mail, SearchMailArgs
-from .client import MittePro
+from client import MittePro
+from models import Mail, SearchMailArgs
 
 
-class TestAuthentication(unittest.TestCase):
+class TestMittePro(unittest.TestCase):
     def setUp(self):
         self.server_uri_test = None
         self.variables = {
@@ -71,7 +71,7 @@ class TestAuthentication(unittest.TestCase):
         attachments = []
         files = self.variables['files_names']
         for dfile in files:
-            content = base64.encodestring(open(
+            content = base64.encodebytes(open(
                 os.path.join(os.path.expanduser('~'), 'test_files', dfile), 'rb'
             ).read())
             attachments.append({'file': content, 'name': dfile})
@@ -81,48 +81,46 @@ class TestAuthentication(unittest.TestCase):
         # attachments = []
         # attachments = self.get_attachments()
         mail = Mail(
-            recipient_list=self.variables['recipients'],
-            message_text='Mah oia só https://pypi.org/',
-            # remove comment if you gonna tested
-            # message_html=self.variables["message_html"],
-            from_=self.variables['from_'],
-            # batchs=self.variables['batchs'],
-            # time_between_batchs=self.variables['time_between_batchs'],
-            subject="Just a test - Sended From_ Client AT 09",
-            send_at='2018-11-16 10:45',
-            # send_at='2018-02-05 09:32:00',
-            activate_tracking=False,
             track_open=False,
             track_html_link=False,
-            track_text_link=False,
-            # attachments=attachments
+            track_text_link=True,
+            activate_tracking=False,
+            subject='Mittepro-py client test',
+            # send_at='2019-05-04 08:00:00',
+            message_text=self.variables['message_text'],
+            message_html=self.variables['message_html'],
+            from_=self.variables['from_'],
+            recipient_list=self.variables['recipients'],
+            # context={'GMERGE': 'Mah oia Soh'},
+            # context_per_recipient=self.variables['']
         )
-        response = self.mittepro.send(mail)
-        print("response", response)
-        if response and 'emails_enviados' in response:
-            self.assertGreater(len(response['emails_enviados']), 0)
-        else:
-            self.assertIsNotNone(response)
+        try:
+            response = self.mittepro.send(mail)
+            if response and 'emails_enviados' in response:
+                self.assertGreater(len(response['emails_enviados']), 0)
+            else:
+                self.assertIsNotNone(response)
+        except Exception as e:
+            print("Exception", e)
 
-    def test_method_post_template(self):
+    def t2est_method_post_template(self):
         # attachments = []
         # attachments = self.get_attachments()
         mail = Mail(
-            # headers={'X_CLIENT_ID': 1},
+            track_open=True,
+            track_html_link=False,
+            track_text_link=False,
+            activate_tracking=True,
+            subject='Mittepro-py client test',
+            send_at='2019-05-04 08:00:00',
+            from_=self.variables['from_'],
             recipient_list=self.variables['recipients'],
-            # from_=self.variables['from_'],
-            template_slug=self.variables['template_slug'],
-            context={'foobar': True},
-            context_per_recipient=self.variables['context_per_recipient'],
-            subject="Just a test - Sended From Client AT 09",
-            # remove comment if you gonna tested
-            # message_text=self.variables["message_text"],
-            # message_html=self.variables["message_html"],
-            # use_tpl_default_subject=True,
+            template_slug='tpl-teste',
+            use_tpl_default_name=True,
             use_tpl_default_email=True,
-            # use_tpl_default_name=True,
-            # activate_tracking=True,
-            # get_text_from_html=True,
+            use_tpl_default_subject=True,
+            context={'GMERGE': 'Mah oia Soh'},
+            context_per_recipient=self.variables['context_per_recipient'],
             # attachments=attachments
         )
         # print mail.get_payload()
@@ -133,23 +131,33 @@ class TestAuthentication(unittest.TestCase):
         else:
             self.assertIsNotNone(response)
 
-    def test_method_get_mail_search(self):
+    def t2est_method_get_mail_search(self):
         search_args = SearchMailArgs(
-            app_ids=self.search_variables['app_ids'],
+            end=self.search_variables['end'],
             start=self.search_variables['start'],
-            end=self.search_variables['end']
+            app_cods=self.search_variables['app_ids'],
+            # name_sender=self.search_variables['name_sender'],
+            # email_sender=self.search_variables['email_sender'],
+            # name_receiver=self.search_variables['name_receiver'],
+            # template_slug=self.search_variables['template_slug'],
+            # email_receiver=self.search_variables['email_receiver'],
         )
         response = self.mittepro.mail_search(search_args)
-        if response and len(response) > 0:
-            self.assertGreater(len(response), 0)
+        if response and 'qtd_mails' in response and response['qtd_mails'] > 0:
+            print("qtd_mails %s" % response['qtd_mails'])
+            self.assertGreater(response['qtd_mails'], 0)
         else:
+            print("Nothing found")
             self.assertIsNotNone(response)
 
-    def test_method_get_mail_search_by_ids(self):
+    def t2est_method_get_mail_search_by_ids(self):
         response = self.mittepro.mail_search_by_ids(self.search_variables['uuids'])
         if response and len(response) > 0:
+            print("uuids %s" % self.search_variables['uuids'])
+            print("len(response) %s" % len(response))
             self.assertGreater(len(response), 0)
         else:
+            print("Nothing found")
             self.assertIsNotNone(response)
 
 if __name__ == '__main__':
