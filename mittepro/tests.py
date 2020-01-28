@@ -65,7 +65,7 @@ class TestMittePro(unittest.TestCase):
             self.search_variables = search_variables
 
         self.mittepro = MittePro(key=self.variables['key'], secret=self.variables['secret'], fail_silently=False,
-                                 server_uri=self.server_uri_test, timeout_read=20)
+                                 timeout_read=20)
 
     def get_attachments(self):
         attachments = []

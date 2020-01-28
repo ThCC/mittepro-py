@@ -4,8 +4,13 @@ import arrow
 import hashlib
 import datetime
 import collections
-from ..utils import merge_two_dicts
 from .query_encoder import QueryEncoder
+
+
+def merge_two_dicts(d1, d2):
+    d3 = d1.copy()
+    d3.update(d2)
+    return d3
 
 
 class ArgumentError(Exception):

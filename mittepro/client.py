@@ -13,7 +13,7 @@ class MittePro(Api):
         if server_uri:
             self.server_uri = server_uri
         else:
-            self.server_uri = 'http://www.mitte.pro'
+            self.server_uri = 'https://www.mitte.pro'
 
         if not key:
             raise ImproperlyConfigured('A chave pública da API tem que ser passada no construtor')
