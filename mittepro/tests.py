@@ -14,8 +14,8 @@ except ImportError:
 import os
 import base64
 import unittest
-from client import MittePro
-from models import Mail, SearchMailArgs
+from .client import MittePro
+from .models import Mail, SearchMailArgs
 
 
 class TestMittePro(unittest.TestCase):
@@ -101,7 +101,7 @@ class TestMittePro(unittest.TestCase):
             else:
                 self.assertIsNotNone(response)
         except Exception as e:
-            print("Exception", e)
+            print(("Exception", e))
 
     def t2est_method_post_template(self):
         # attachments = []
@@ -125,7 +125,7 @@ class TestMittePro(unittest.TestCase):
         )
         # print mail.get_payload()
         response = self.mittepro.send_template(mail)
-        print("response", response)
+        print(("response", response))
         if response and 'emails_enviados' in response:
             self.assertGreater(len(response['emails_enviados']), 0)
         else:
@@ -144,7 +144,7 @@ class TestMittePro(unittest.TestCase):
         )
         response = self.mittepro.mail_search(search_args)
         if response and 'qtd_mails' in response and response['qtd_mails'] > 0:
-            print("qtd_mails %s" % response['qtd_mails'])
+            print(("qtd_mails %s" % response['qtd_mails']))
             self.assertGreater(response['qtd_mails'], 0)
         else:
             print("Nothing found")
@@ -153,8 +153,8 @@ class TestMittePro(unittest.TestCase):
     def t2est_method_get_mail_search_by_ids(self):
         response = self.mittepro.mail_search_by_ids(self.search_variables['uuids'])
         if response and len(response) > 0:
-            print("uuids %s" % self.search_variables['uuids'])
-            print("len(response) %s" % len(response))
+            print(("uuids %s" % self.search_variables['uuids']))
+            print(("len(response) %s" % len(response)))
             self.assertGreater(len(response), 0)
         else:
             print("Nothing found")

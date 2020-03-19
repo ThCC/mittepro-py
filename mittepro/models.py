@@ -3,8 +3,8 @@ import re
 import arrow
 import base64
 from datetime import datetime
-from mitte_exceptions import InvalidParam
-from utils import item_in_dict, item_not_in_dict, attr_in_instance, attr_not_in_instance
+from .mitte_exceptions import InvalidParam
+from .utils import item_in_dict, item_not_in_dict, attr_in_instance, attr_not_in_instance
 
 
 class Mail(object):

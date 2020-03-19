@@ -3,6 +3,8 @@
 mittepro/test_variables.py
 mittepro/test_variables.pyc
 build/bdist.linux-x86_64/
+env_mittepro/
 *.pyc
+*.bak
 __pycache__
 build/lib/mittepro/test_variables.py

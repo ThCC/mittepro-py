@@ -5,11 +5,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='mittepro',
-    version='2.3.4',
+    version='3.0.0',
     install_requires=[
         'six>=1.12.0',
         'arrow>=0.12.1',
-        'requests==2.21.0',
+        'requests==2.23.0',
         'simplejson==3.16.0',
     ],
     url='https://github.com/ThCC/mittepro-py',
@@ -28,6 +28,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries',
     ],
     author='Thiago Cardoso de Castro',
