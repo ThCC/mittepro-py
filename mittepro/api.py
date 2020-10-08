@@ -8,7 +8,7 @@ from apysignature.query_encoder import QueryEncoder
 from apysignature.signature import Request as Request_sig, Token
 from requests import Request, Session, ReadTimeout, ConnectTimeout, HTTPError
 
-__version__ = '2.2.1'
+__version__ = '2.4.0'
 logging.basicConfig(format='%(asctime)s %(message)s')
 
 
@@ -59,7 +59,7 @@ class Api(object):
             url += '?'
         else:
             url += '&'
-        for key, value in payload.items():
+        for key, value in list(payload.items()):
             url += QueryEncoder.encode_param(key, str(value)) + '&'
         return url.rstrip('&')
 

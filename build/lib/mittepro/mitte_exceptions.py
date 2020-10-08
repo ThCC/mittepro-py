@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-import six
 
 
 class BaseError(Exception):
     def __init__(self, message=None, codigo=None, message_values=()):
         self.message_values = message_values
         self.codigo = codigo
-        if six.PY2:
-            super(Exception, self).__init__(message)
-        else:
-            super().__init__(message)
+        super().__init__(message)
 
 
 class InvalidParam(BaseError):
@@ -18,10 +14,7 @@ class InvalidParam(BaseError):
         self.codigo = codigo
         if message_values:
             message = message.format(*message_values)
-        if six.PY2:
-            super(InvalidParam, self).__init__(message)
-        else:
-            super().__init__(message)
+        super().__init__(message)
 
 
 class APIError(BaseError):
@@ -30,10 +23,7 @@ class APIError(BaseError):
         self.codigo = codigo
         if message_values:
             message = message.format(*message_values)
-        if six.PY2:
-            super(APIError, self).__init__(message)
-        else:
-            super().__init__(message)
+        super().__init__(message)
 
 
 class TimeoutError(BaseError):
@@ -43,10 +33,7 @@ class TimeoutError(BaseError):
         self.codigo = codigo
         if message_values:
             message = message.format(*message_values)
-        if six.PY2:
-            super(TimeoutError, self).__init__(message)
-        else:
-            super().__init__(message)
+        super().__init__(message)
 
 
 class ImproperlyConfigured(BaseError):
@@ -55,7 +42,4 @@ class ImproperlyConfigured(BaseError):
         self.codigo = codigo
         if message_values:
             message = message.format(*message_values)
-        if six.PY2:
-            super(ImproperlyConfigured, self).__init__(message)
-        else:
-            super().__init__(message)
+        super().__init__(message)

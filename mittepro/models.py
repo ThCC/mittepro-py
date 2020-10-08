@@ -12,13 +12,22 @@ class Mail(object):
     EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
 
     def __init__(self, **kwargs):
-        assert 'from_' in kwargs or item_in_dict(kwargs, 'use_tpl_default_email'), \
-            'Impossível enviar email sem o parâmetro "from". É preciso fornecer o parâmetro "from" ou ' \
-            '"use_tpl_default_email"'
-        assert 'recipient_list' in kwargs and len(kwargs.get('recipient_list')), \
-            'Impossível enviar um email sem uma lista de destinatários'
-        assert 'subject' in kwargs or item_in_dict(kwargs, 'use_tpl_default_subject'), \
-            'Impossível enviar um email sem um assunto'
+        if not item_in_dict(kwargs, 'from_') and not item_in_dict(kwargs, 'use_tpl_default_email'):
+            raise InvalidParam(message_values=(
+                "'from_' ou 'use_tpl_default_email'", 
+                'Impossível enviar email sem o parâmetro "from_". É preciso fornecer o parâmetro "from_" ou ' \
+                '"use_tpl_default_email"'
+            ))
+        if not item_in_dict(kwargs, 'recipient_list') or len(kwargs.get('recipient_list')) == 0:
+            raise InvalidParam(message_values=(
+                "'recipient_list'", 'Impossível enviar um email sem uma lista de destinatários'
+            ))
+        if not item_in_dict(kwargs, 'subject') and not item_in_dict(kwargs, 'use_tpl_default_subject'):
+            raise InvalidParam(message_values=(
+                "'subject' ou 'use_tpl_default_subject'", 
+                'Impossível enviar email sem o parâmetro "subject". É preciso fornecer o parâmetro "subject" ou ' \
+                '"use_tpl_default_subject"'
+            ))
 
         # General mail vars
         self.set_attr('tags', kwargs)
@@ -108,9 +117,9 @@ class Mail(object):
 
     def get_payload(self, endpoint='text'):
         if endpoint == 'template':
-            if attr_not_in_instance(self, 'template_slug') and attr_not_in_instance(self, 'message_html'):
-                raise AssertionError("Impossível enviar um email com template sem o conteúdo html. Ou você fornece "
-                                     "o 'template_slug' ou o 'message_html'")
+            if attr_not_in_instance(self, 'template_slug'):
+                raise AssertionError("Impossível enviar um email com template sem o conteúdo html. Forneça "
+                                     "o 'template_slug'")
             if ((attr_in_instance(self, 'use_tpl_default_subject') or
                  attr_in_instance(self, 'use_tpl_default_email') or
                  attr_in_instance(self, 'use_tpl_default_name')) and

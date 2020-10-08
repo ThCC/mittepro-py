@@ -1,4 +1,3 @@
-import six
 import hmac
 import arrow
 import hashlib
@@ -51,7 +50,7 @@ class Request(object):
         query_dict = {}
         auth_dict = {}
 
-        for key, value in query.items():
+        for key, value in list(query.items()):
             key = key.lower()
             if 'auth_' in key:
                 auth_dict[key] = value
@@ -80,7 +79,7 @@ class Request(object):
         param_hash = merge_two_dicts(self.query_dict, (self.auth_dict or {}))
         # Convert keys to lowercase strings
         params_dict = {}
-        for key, value in param_hash.items():
+        for key, value in list(param_hash.items()):
             params_dict[key.lower()] = value
 
         # Exclude signature from signature generation!
@@ -89,7 +88,7 @@ class Request(object):
 
         params_dict = collections.OrderedDict(sorted(params_dict.items()))
         params_list = []
-        for key, value in params_dict.items():
+        for key, value in list(params_dict.items()):
             params_list.append(QueryEncoder.encode_param_without_escaping(key, value))
         return '&'.join(params_list)
 
@@ -98,7 +97,4 @@ class Request(object):
 
     def signature(self, token):
         msg = self.string_to_sign()
-        if six.PY2: 
-            return hmac.new(str(token.secret), msg, hashlib.sha256).hexdigest()
-        else:
-            return hmac.new(bytes(token.secret, 'utf8'), bytes(msg, 'utf8'), hashlib.sha256).hexdigest()
+        return hmac.new(bytes(token.secret, 'utf8'), bytes(msg, 'utf8'), hashlib.sha256).hexdigest()
