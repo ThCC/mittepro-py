@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
-from api import endpoint, Api
-from models import SearchMailArgs
-from mitte_exceptions import ImproperlyConfigured
+from .api import endpoint, Api
+from .models import SearchMailArgs
+from .mitte_exceptions import ImproperlyConfigured
 
 
 class MittePro(Api):

@@ -2,13 +2,13 @@ import json
 import arrow
 import logging
 import requests
-from utils import is_json
-from mitte_exceptions import APIError, TimeoutError
-from apysignature.query_encoder import QueryEncoder
-from apysignature.signature import Request as Request_sig, Token
+from .utils import is_json
+from .mitte_exceptions import APIError, TimeoutError
+from .apysignature.query_encoder import QueryEncoder
+from .apysignature.signature import Request as Request_sig, Token
 from requests import Request, Session, ReadTimeout, ConnectTimeout, HTTPError
 
-__version__ = '2.4.0'
+__version__ = '2.4.1'
 logging.basicConfig(format='%(asctime)s %(message)s')
 
 
