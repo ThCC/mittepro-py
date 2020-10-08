@@ -65,7 +65,7 @@ class TestMittePro(unittest.TestCase):
             self.search_variables = search_variables
 
         self.mittepro = MittePro(key=self.variables['key'], secret=self.variables['secret'], fail_silently=False,
-                                 timeout_read=20)
+                                 server_uri='http://192.168.0.43:8000', timeout_read=20)
 
     def get_attachments(self):
         attachments = []
@@ -81,21 +81,23 @@ class TestMittePro(unittest.TestCase):
         # attachments = []
         # attachments = self.get_attachments()
         mail = Mail(
-            track_open=False,
-            track_html_link=False,
-            track_text_link=True,
-            activate_tracking=False,
+            # use_tpl_default_subject=True,
+            # track_open=False,
+            # track_html_link=False,
+            # track_text_link=True,
+            # activate_tracking=False,
             subject='Mittepro-py client test',
             # send_at='2019-05-04 08:00:00',
-            message_text=self.variables['message_text'],
-            message_html=self.variables['message_html'],
+            # message_text=self.variables['message_text'],
+            # message_html=self.variables['message_html'],
+            template_slug=self.variables['template_slug'],
             from_=self.variables['from_'],
             recipient_list=self.variables['recipients'],
             # context={'GMERGE': 'Mah oia Soh'},
             # context_per_recipient=self.variables['']
         )
         try:
-            response = self.mittepro.send(mail)
+            response = self.mittepro.send_template(mail)
             if response and 'emails_enviados' in response:
                 self.assertGreater(len(response['emails_enviados']), 0)
             else:

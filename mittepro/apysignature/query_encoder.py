@@ -1,6 +1,5 @@
-import six
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 
 class QueryEncoder(object):
@@ -19,13 +18,8 @@ class QueryEncoder(object):
         else:
             if isinstance(value, dict):
                 value = json.dumps(value)
-            elif six.PY2 and isinstance(value, unicode):
-                value = str(value.encode('utf-8'))
         return "{key}={value}".format(key=key, value=value)
 
     @staticmethod
     def escape(s):
-        if six.PY2:
-            return urllib.quote(s, '')
-        else:
-            return urllib.parse.quote(s, '')
+        return urllib.parse.quote(s, '')

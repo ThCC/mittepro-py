@@ -1,10 +1,9 @@
-import six
 import hmac
 import arrow
 import hashlib
 import datetime
 import collections
-from .query_encoder import QueryEncoder
+from query_encoder import QueryEncoder
 
 
 def merge_two_dicts(d1, d2):
@@ -98,7 +97,4 @@ class Request(object):
 
     def signature(self, token):
         msg = self.string_to_sign()
-        if six.PY2: 
-            return hmac.new(str(token.secret), msg, hashlib.sha256).hexdigest()
-        else:
-            return hmac.new(bytes(token.secret, 'utf8'), bytes(msg, 'utf8'), hashlib.sha256).hexdigest()
+        return hmac.new(bytes(token.secret, 'utf8'), bytes(msg, 'utf8'), hashlib.sha256).hexdigest()
